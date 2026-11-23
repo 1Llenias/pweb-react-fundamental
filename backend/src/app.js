@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 
 const healthRoutes = require("./routes/health.routes");
+const productRoutes = require("./routes/product.routes");
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/health", healthRoutes);
+app.use("/api/products", productRoutes);
 
 // Root endpoint
 app.get("/", (req, res) => {
