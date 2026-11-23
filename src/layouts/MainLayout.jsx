@@ -19,6 +19,7 @@ const navigation = [
     name: 'Settings',
     path: '/settings',
     icon: Settings,
+    end: true,
   },
 ]
 
