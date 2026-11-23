@@ -307,3 +307,129 @@ button { cursor: pointer; }
   gap: 8px;
   text-decoration: none;
 }
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  padding: 21px;
+  border: 1px solid #e0e4ec;
+  border-radius: 13px;
+  background: white;
+  box-shadow: 0 3px 8px #0f172a08;
+}
+
+.stat-icon {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 17px;
+  border-radius: 10px;
+  color: #0755ee;
+  background: #eaf1ff;
+}
+
+.stat-card > p {
+  margin: 0 0 7px;
+  color: #65708a;
+  font-size: 13px;
+}
+
+.stat-card h2 {
+  margin: 0;
+  font-size: clamp(18px, 2vw, 25px);
+  overflow-wrap: anywhere;
+}
+
+.dashboard-section {
+  margin-top: 30px;
+  padding: 23px;
+  border: 1px solid #e0e4ec;
+  border-radius: 13px;
+  background: white;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.section-heading h2 {
+  margin: 0 0 5px;
+  font-size: 19px;
+}
+
+.section-heading p {
+  margin: 0;
+  color: #65708a;
+  font-size: 13px;
+}
+
+.section-heading a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #0755ee;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.low-stock-list {
+  display: grid;
+  gap: 10px;
+}
+
+.low-stock-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e0e4ec;
+  border-radius: 9px;
+}
+
+.low-stock-item > div {
+  display: grid;
+  gap: 4px;
+}
+
+.low-stock-item strong {
+  font-size: 14px;
+}
+
+.low-stock-item > div span {
+  color: #65708a;
+  font-size: 12px;
+}
+
+.stock-warning {
+  color: #d97706;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
