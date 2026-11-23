@@ -11,6 +11,7 @@ import {
   updateProduct,
   deleteProduct,
 } from '../services/productService.js'
+import { useOutletContext } from 'react-router'
 
 export default function ProductPage() {
   const [products, setProducts] = useState([])
@@ -20,6 +21,7 @@ export default function ProductPage() {
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [modalError, setModalError] = useState('')
+  const { viewMode } = useOutletContext()
 
   // Fetch products from backend
   async function fetchProducts() {
@@ -134,6 +136,7 @@ export default function ProductPage() {
             products={filteredProducts}
             onEdit={openEditModal}
             onDelete={openDeleteModal}
+            viewMode={viewMode}
           />
 
           <p className="result-info">
