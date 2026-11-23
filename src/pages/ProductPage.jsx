@@ -1,15 +1,44 @@
-import { useMemo, useState } from 'react'
+
+import { useEffect, useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import Button from '../components/atoms/Button.jsx'
 import ProductSearch from '../components/molecules/ProductSearch.jsx'
 import ProductGrid from '../components/organisms/ProductGrid.jsx'
 import ProductModal from '../components/organisms/ProductModal.jsx'
-import { initialProducts } from '../data/products.js'
+import {
+  getProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from '../services/productService.js'
 
 export default function ProductPage() {
-  const [products, setProducts] = useState(initialProducts)
+  const [products, setProducts] = useState([])
   const [search, setSearch] = useState('')
   const [modal, setModal] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [modalError, setModalError] = useState('')
+
+  // Fetch products from backend
+  async function fetchProducts() {
+    try {
+      setLoading(true)
+      setError('')
+
+      const data = await getProducts()
+      setProducts(data)
+    } catch (err) {
+      setError(err.message || 'Gagal mengambil data produk.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
 
   const filteredProducts = useMemo(
     () => products.filter((product) =>
@@ -18,37 +47,60 @@ export default function ProductPage() {
     [products, search],
   )
 
-  function openAddModal() {
-    setModal({ mode: 'add', product: null })
-  }
-
-  function openEditModal(product) {
-    setModal({ mode: 'edit', product })
-  }
-
-  function openDeleteModal(product) {
-    setModal({ mode: 'delete', product })
-  }
-
-  function saveProduct(data) {
-    if (modal.mode === 'add') {
-      const nextId = products.length
-        ? Math.max(...products.map((product) => product.id)) + 1
-        : 1
-      setProducts((current) => [...current, { id: nextId, ...data }])
-    } else {
-      setProducts((current) => current.map((product) =>
-        product.id === modal.product.id ? { ...product, ...data } : product,
-      ))
+    function openAddModal() {
+      setError('')
+      setModalError('')
+      setModal({ mode: 'add', product: null })
     }
-    setModal(null)
+
+    function openEditModal(product) {
+      setError('')
+      setModalError('')
+      setModal({ mode: 'edit', product })
+    }
+
+    function openDeleteModal(product) {
+      setError('')
+      setModalError('')
+      setModal({ mode: 'delete', product })
+    }
+
+  // Create or update product
+  async function saveProduct(data) {
+    try {
+      setSaving(true)
+      setError('')
+
+      if (modal.mode === 'add') {
+        await createProduct(data)
+      } else {
+        await updateProduct(modal.product.id, data)
+      }
+
+      await fetchProducts()
+      setModal(null)
+    } catch (err) {
+      setModalError(err.message || 'Gagal menyimpan produk.')
+    } finally {
+      setSaving(false)
+    }
   }
 
-  function deleteProduct() {
-    setProducts((current) => current.filter(
-      (product) => product.id !== modal.product.id,
-    ))
-    setModal(null)
+  // Delete product
+  async function handleDeleteProduct() {
+    try {
+      setSaving(true)
+      setError('')
+
+      await deleteProduct(modal.product.id)
+
+      await fetchProducts()
+      setModal(null)
+    } catch (err) {
+      setModalError(err.message || 'Gagal menghapus produk.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -63,28 +115,44 @@ export default function ProductPage() {
         </Button>
       </header>
 
+      {error && (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      )}
+
       <div className="toolbar">
         <ProductSearch value={search} onChange={setSearch} />
         <span className="product-count">{filteredProducts.length} produk</span>
       </div>
 
-      <ProductGrid
-        products={filteredProducts}
-        onEdit={openEditModal}
-        onDelete={openDeleteModal}
-      />
+      {loading ? (
+        <p>Memuat produk...</p>
+      ) : (
+        <>
+          <ProductGrid
+            products={filteredProducts}
+            onEdit={openEditModal}
+            onDelete={openDeleteModal}
+          />
 
-      <p className="result-info">
-        Menampilkan {filteredProducts.length} dari {products.length} produk
-      </p>
+          <p className="result-info">
+            Menampilkan {filteredProducts.length} dari {products.length} produk
+          </p>
+        </>
+      )}
 
       {modal && (
         <ProductModal
           mode={modal.mode}
           product={modal.product}
-          onClose={() => setModal(null)}
+          onClose={() => {
+            if (!saving) setModal(null)
+          }}
           onSave={saveProduct}
-          onConfirmDelete={deleteProduct}
+          onConfirmDelete={handleDeleteProduct}
+          saving={saving}
+          error={modalError}
         />
       )}
     </main>
